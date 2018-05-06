@@ -1,4 +1,3 @@
-(function() {
 	// The width and height of the captured photo. We will set the
   	// width to the value defined here, but the height will be
   	// calculated based on the aspect ratio of the input stream.
@@ -13,37 +12,36 @@
 
 	// The various HTML elements we need to configure or control. These
 	// will be set by the startup() function.
-	var video = null;
-	var canvas = null;
-	var photo = null;
-	var capture = document.getElementById('capture');
+    	var video = document.getElementById('video');
+    	var canvas = document.getElementById('canvas');
 	
-	capture.addEventListener('click', function(e){
+	function webcamClick()
+	{
+		var capture = document.getElementById('capture');
 		if(!streaming)
 		{
-    			video = document.getElementById('video');
-    			canvas = document.getElementById('canvas');
-    			photo = document.getElementById('photo');
 			const constraints = {
 				video: true
 			};
 
-				console.log("OK");
     			navigator.mediaDevices.getUserMedia(constraints)
 			.then(function(stream){
-				console.log("OK");
 				video.srcObject = stream;
+				video.play();
+				capture.value = "Capture Image";
+				streaming = true;
       			})
 			.catch(function(err) {
-		        	console.log("An error occured! " + err);
+		        	console.log("An error occured when trying to start webcam! " + err);
 			});
 		
 		}
 		else
 		{
-
+			context.clearRect(0,0,canvas.width,canvas.height);
+        		context.drawImage(video, 69, 50);
 		}
-	});
+	}
 /*
     video.addEventListener('canplay', function(ev){
       if (!streaming) {
@@ -105,5 +103,4 @@
       clearphoto();
     }
   }*/
-})();
 

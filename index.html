@@ -2,23 +2,41 @@
 <html lang="en">
 	<head>
     		<meta charset="utf-8">
-		<!--<script src="http://webrtc.github.io/adapter/adapter-latest.js"></script>-->
+		<script src="http://webrtc.github.io/adapter/adapter-latest.js"></script>
+		<script src="js/capture.js"></script>
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+		<link rel="stylesheet" href="css/main.css">
   	</head>
-  <body>
-	<div id="output">
-	<p> output
-	</div>
-	<video id="video" controls autoplay></video>
-	<button id="capture">Capture Image</button>
-    <input id="imageUpload" type="file" name="photo" accept="image/*" placeholder="Photo" required="" onchange="changeImage(this)"/> 
+  	<body>
+		<div id="output">
+			<p> output
+		</div>
+		<video id="video"></video>
+	  	<input  class="button black" id="capture" type="button" value="Open Webcam" onclick="webcamClick()" />	
+    		<input id="imageUpload" type="file" name="photo" accept="image/*" placeholder="Photo" required="" onchange="changeImage(this)"/> 
+		<canvas id="canvas" width="578" height="400"></canvas>
+		<form id="form" enctype="multipart/form-data" name="form">	
+			<div class="form-group">
+				<label for="senderEmail">Your Email Address</label>
+				<input type="email" class="form-control" id="senderEmail" name="senderEmail" aria-describedby="emailHelp" placeholder="Enter your email" required>
+			</div>
+			<div class="form-group">
+				<label for="receiverEmail">Recipient's Email Address</label>
+				<input type="email" class="form-control" id="receiverEmail" name="receiverEmail" paria-describedby="emailHelp" placeholder="Enter recipient's email" required>
+			</div>
+			<button type="submit" class="btn btn-primary">Send</button>
+		</form>        
 
-	<canvas id="canvas" width="578" height="400"></canvas>
     <script>
       var canvas = document.getElementById('canvas');
       var context = canvas.getContext('2d');
 	var video = document.getElementById('video');
 	var output = document.getElementById('output');
-
+	var form = document.getElementById('form');
+    	form.addEventListener('submit', function(event) {
+		event.preventDefault();
+		submitPostcard();
+	});
 	function changeImage(image)
 	{
 		var reader = new FileReader();
@@ -28,26 +46,61 @@
       			var imageObj = new Image();
       			imageObj.onload = function() 
 			{
+				context.clearRect(0,0,canvas.width,canvas.height);
         			context.drawImage(imageObj, 69, 50);
-      			};
+				context.font = "bold 16px Arial";
+      				context.fillText("Zibri", (canvas.width / 2) - 17, (canvas.height / 2) + 8);
+
+			};
 			imageObj.src = reader.result;
-			context.clearRect(0,0,canvas.width,canvas.height);
       		};
         	reader.readAsDataURL(image.files[0]);
 	}
-
-			const constraints = {
-				video: true
-			};
-			navigator.mediaDevices = navigator.mozGetUserMedia;
-    			navigator.mediaDevices.getUserMedia(constraints)
-			.then(function(stream){
-				video.srcObject = stream;
-      			})
-			.catch(function(err) {
-		        	console.log("An error occured! " + err);
-			});
+	function isCanvasBlank() 
+	{
+    		const blank = document.createElement('canvas');
+    		blank.width = canvas.width;
+    		blank.height = canvas.height;
+		return canvas.toDataURL() == blank.toDataURL();
+	}
+	function submitPostcard()
+	{
+		if(isCanvasBlank())
+		{
+			output.innerHTML = "No image was submitted" + "<p>";
+			return;
+		}
+		var image = canvas.toDataURL("image/jpeg");
+		var formData = new FormData(form);
+		formData.append('image',image);
+		sendRequest(formData);	
+	}
+	function handleResponse(response)
+	{
+		var text = JSON.parse(response);
+		console.log(text);
+		output.innerHTML = text+"<p>";
+	}
+	function sendRequest(dataRequest)
+	{
+		var request = new XMLHttpRequest();
+		request.open("POST","request.php",true);
+		//request.setRequestHeader("Content-Type","application/json");
+		request.onreadystatechange= function ()
+		{
+			if ((this.readyState == 4)&&(this.status == 200))
+			{
+				handleResponse(this.responseText);
+			}	
+			else
+			{
+				output.innerhtml = "Error occurred while trying to send request, " + this.status;
+			}	
+		}
+		request.send(dataRequest);
+	}
+	
+	
     </script>
-	<!--<script src="scripts/capture.js"></script>-->
   </body>
 </html>      
