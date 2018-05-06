@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    		<meta charset="utf-8">
+		<!--<script src="http://webrtc.github.io/adapter/adapter-latest.js"></script>-->
+  	</head>
+  <body>
+	<div id="output">
+	<p> output
+	</div>
+	<video id="video" controls autoplay></video>
+	<button id="capture">Capture Image</button>
+    <input id="imageUpload" type="file" name="photo" accept="image/*" placeholder="Photo" required="" onchange="changeImage(this)"/> 
+
+	<canvas id="canvas" width="578" height="400"></canvas>
+    <script>
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+	var video = document.getElementById('video');
+	var output = document.getElementById('output');
+
+	function changeImage(image)
+	{
+		var reader = new FileReader();
+      		reader.onload = function(e) 
+		{
+			var img = document.getElementById('img');
+      			var imageObj = new Image();
+      			imageObj.onload = function() 
+			{
+        			context.drawImage(imageObj, 69, 50);
+      			};
+			imageObj.src = reader.result;
+			context.clearRect(0,0,canvas.width,canvas.height);
+      		};
+        	reader.readAsDataURL(image.files[0]);
+	}
+
+			const constraints = {
+				video: true
+			};
+			navigator.mediaDevices = navigator.mozGetUserMedia;
+    			navigator.mediaDevices.getUserMedia(constraints)
+			.then(function(stream){
+				video.srcObject = stream;
+      			})
+			.catch(function(err) {
+		        	console.log("An error occured! " + err);
+			});
+    </script>
+	<!--<script src="scripts/capture.js"></script>-->
+  </body>
+</html>      
