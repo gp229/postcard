@@ -1,9 +1,9 @@
 #video {
   	border: 1px solid black;
   	box-shadow: 2px 2px 3px black;
-	position: absolute;
-	width: 0%;
-	height: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	display: none;
 }
 
 #color-input {
@@ -39,4 +39,7 @@ canvas:hover {
 .container {
     width: 100%;
     display: inline-block;
+}
+body {
+	padding-top: 5%;
 }
