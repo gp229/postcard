@@ -19,7 +19,6 @@ function cUndo() {
         cStep--;
         var canvasPic = new Image();
         canvasPic.src = cPushArray[cStep];
-	console.log(canvasPic.src);
         canvasPic.onload = function () 
 	{ 	
 		context.clearRect(0,0,canvas.width,canvas.height);
@@ -39,6 +38,11 @@ function cRedo() {
 		context.drawImage(canvasPic, 0, 0); 
 	}
     }
+}
+
+function cClear() {
+	cPushArray = new Array();
+	cStep = -1;
 }
 undoButton.addEventListener('click', function() {
     cUndo();
